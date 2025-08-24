@@ -2,35 +2,23 @@
 
 #[ink::contract]
 mod validator {
-
-    /// Defines the storage of your contract.
-    /// Add new fields to the below struct in order
-    /// to add new static storage fields to your contract.
     #[ink(storage)]
-    pub struct Validator {
-        /// Stores a single `bool` value on the storage.
-        value: bool,
-    }
+    pub struct Validator {}
 
     impl Validator {
-        /// Constructor that initializes the `bool` value to the given `init_value`.
         #[ink(constructor)]
-        pub fn new(init_value: bool) -> Self {
-            Self { value: init_value }
+        pub fn new() -> Self { Self {} }
+
+        #[ink(message)]
+        pub fn validate_chess_moves(&self, _moves: Vec<String>) -> Option<AccountId> {
+            // Stub: Replay moves, return winner
+            None
         }
 
-        /// A message that can be called on instantiated contracts.
-        /// This one flips the value of the stored `bool` from `true`
-        /// to `false` and vice versa.
         #[ink(message)]
-        pub fn flip(&mut self) {
-            self.value = !self.value;
-        }
-
-        /// Simply returns the current value of our `bool`.
-        #[ink(message)]
-        pub fn get(&self) -> bool {
-            self.value
+        pub fn validate_tetris_scores(&self, _scores: (u32, u32)) -> Option<AccountId> {
+            //Stub for Tetris
+            None
         }
     }
 
@@ -46,9 +34,9 @@ mod validator {
         #[ink::test]
         fn it_works() {
             let mut validator = Validator::new(false);
-            assert_eq!(validator.get(), false);
-            validator.flip();
-            assert_eq!(validator.get(), true);
+            //assert_eq!(validator.get(), false);
+            //validator.flip();
+            //assert_eq!(validator.get(), true);
         }
     }
 
@@ -81,11 +69,12 @@ mod validator {
                 .expect("instantiate failed");
             let mut call_builder = contract.call_builder::<Validator>();
 
-            let get = call_builder.get();
+            let get = call_builder.validate_chess_moves();
             let get_result = client.call(&ink_e2e::bob(), &get).dry_run().await?;
             assert!(matches!(get_result.return_value(), false));
 
             // When
+            /*
             let flip = call_builder.flip();
             let _flip_result = client
                 .call(&ink_e2e::bob(), &flip)
@@ -97,6 +86,7 @@ mod validator {
             let get = call_builder.get();
             let get_result = client.call(&ink_e2e::bob(), &get).dry_run().await?;
             assert!(matches!(get_result.return_value(), true));
+            */
 
             Ok(())
         }
